@@ -17,7 +17,7 @@ export CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE
 
 echo "Starting experiment with gpu $CUDA_VISIBLE_DEVICES and config $CONFIG_NAME"
 
-cd "$CURRENT_DIR" || exit
+cd "$CURRENT_DIR/.." || exit
 nice -19 python3 curiosity_runner.py --experiment-config "experiment_configs/$CONFIG_NAME" --output-dir "experiment_configs/tmp"
 
 sleep infinity

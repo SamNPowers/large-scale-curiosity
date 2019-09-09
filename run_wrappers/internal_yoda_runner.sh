@@ -12,6 +12,7 @@ conda activate $CONDA_ENV
 module load cuda-9.0
 module load cudnn-9.0-7.0.5
 
+export PYTHONPATH="$CURRENT_DIR/../baselines"
 export CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE
 
 echo "Starting experiment with gpu $CUDA_VISIBLE_DEVICES and config $CONFIG_NAME"

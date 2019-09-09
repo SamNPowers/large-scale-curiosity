@@ -9,8 +9,8 @@ CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 eval "$(conda shell.bash hook)"
 conda activate $CONDA_ENV
 
-module load cuda-9.0
-module load cudnn-9.0-7.0.5
+module load cuda-10.0
+module load cudnn-10.0-7.3
 
 export PYTHONPATH="$CURRENT_DIR/../..":"$CURRENT_DIR/../../baselines"
 export CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE

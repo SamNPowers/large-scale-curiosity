@@ -1,5 +1,6 @@
 import argparse
 from curiosity_experiment_config import CuriosityExperimentConfig
+import torch  # This is necessary to load the right cuda and cudnn because yoda and tensorflow aren't playing nicely.
 import run as large_scale_baseline
 
 

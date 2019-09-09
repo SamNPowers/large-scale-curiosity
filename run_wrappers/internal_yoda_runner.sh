@@ -3,8 +3,8 @@
 CUDA_VISIBLE="$1"
 CONFIG_NAME="$2"
 
-#CONDA_ENV="venv_curiosity"
-CONDA_ENV="venv_curiosity_tf1_12"
+CONDA_ENV="venv_curiosity"
+#CONDA_ENV="venv_curiosity_tf1_12"
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 eval "$(conda shell.bash hook)"

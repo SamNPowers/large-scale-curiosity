@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-try:
-    from OpenGL import GLU
-except:
-    print("no OpenGL.GLU")
+#try:
+#from OpenGL import GLU
+#except:
+#    print("no OpenGL.GLU")
 import functools
 import os.path as osp
 from functools import partial
@@ -23,12 +23,13 @@ from wrappers import MontezumaInfoWrapper, make_mario_env, make_robo_pong, make_
     make_multi_pong, AddRandomStateToInfo, MaxAndSkipEnv, ProcessFrame84, ExtraTimeLimit
 
 
-def start_experiment(**args):
+def start_experiment(config_file_settings, **args):
     make_env = partial(make_env_all_params, add_monitor=True, args=args)
 
     trainer = Trainer(make_env=make_env,
                       num_timesteps=args['num_timesteps'], hps=args,
-                      envs_per_process=args['envs_per_process'])
+                      envs_per_process=args['envs_per_process'],
+                      experiment_config=config_file_settings)
     log, tf_sess = get_experiment_environment(**args)
     with log, tf_sess:
         logdir = logger.get_dir()
@@ -37,7 +38,7 @@ def start_experiment(**args):
 
 
 class Trainer(object):
-    def __init__(self, make_env, hps, num_timesteps, envs_per_process):
+    def __init__(self, make_env, hps, num_timesteps, envs_per_process, experiment_config):
         self.make_env = make_env
         self.hps = hps
         self.envs_per_process = envs_per_process
@@ -68,7 +69,8 @@ class Trainer(object):
         self.dynamics = Dynamics if hps['feat_learning'] != 'pix2pix' else UNet
         self.dynamics = self.dynamics(auxiliary_task=self.feature_extractor,
                                       predict_from_pixels=hps['dyn_from_pixels'],
-                                      feat_dim=512)
+                                      feat_dim=512,
+                                      experiment_config=experiment_config)
 
         self.agent = PpoOptimizer(
             scope='ppo',
@@ -95,7 +97,13 @@ class Trainer(object):
         self.agent.to_report['aux'] = tf.reduce_mean(self.feature_extractor.loss)
         self.agent.total_loss += self.agent.to_report['aux']
         self.agent.to_report['dyn_loss'] = tf.reduce_mean(self.dynamics.loss)
-        self.agent.total_loss += self.agent.to_report['dyn_loss']
+
+        if not experiment_config.dynamics_loss_off:
+            self.agent.total_loss += self.agent.to_report['dyn_loss']
+
+        self.agent.to_report['discrim_loss'] = tf.reduce_mean(self.dynamics.discriminator_loss)
+        self.agent.to_report['generator_loss'] = tf.reduce_mean(self.dynamics.generator_loss)
+        self.agent.to_report['discrim_reward'] = tf.reduce_mean(self.dynamics.discriminator_reward)
         self.agent.to_report['feat_var'] = tf.reduce_mean(tf.nn.moments(self.feature_extractor.features, [0, 1])[1])
 
     def _set_env_vars(self):
@@ -152,11 +160,11 @@ def get_experiment_environment(**args):
     process_seed = args["seed"] + 1000 * MPI.COMM_WORLD.Get_rank()
     process_seed = hash_seed(process_seed, max_bytes=4)
     set_global_seeds(process_seed)
-    setup_mpi_gpus()
+    #setup_mpi_gpus() spowers. This is inconvenient for debugging. Turn it back on when I need it. TODO
 
-    logger_context = logger.scoped_configure(dir=None,
-                                             format_strs=['stdout', 'log',
-                                                          'csv'] if MPI.COMM_WORLD.Get_rank() == 0 else ['log'])
+    dir = args["output_dir"]
+    logger_context = logger.scoped_configure(dir=dir,
+                                             format_strs=['tensorboard', 'stdout', 'log']) # if MPI.COMM_WORLD.Get_rank() == 0 else ['log'])
     tf_context = setup_tensorflow_session()
     return logger_context, tf_context
 
@@ -188,10 +196,7 @@ def add_rollout_params(parser):
     parser.add_argument('--nlumps', type=int, default=1)
 
 
-if __name__ == '__main__':
-    import argparse
-
-    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+def add_all_default_args(parser):
     add_environments_params(parser)
     add_optimization_params(parser)
     add_rollout_params(parser)
@@ -205,7 +210,14 @@ if __name__ == '__main__':
     parser.add_argument('--layernorm', type=int, default=0)
     parser.add_argument('--feat_learning', type=str, default="none",
                         choices=["none", "idf", "vaesph", "vaenonsph", "pix2pix"])
+    parser.add_argument('--output_dir', type=str, default="tmp")
 
+
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    add_all_default_args(parser)
     args = parser.parse_args()
 
     start_experiment(**args.__dict__)

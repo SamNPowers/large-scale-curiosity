@@ -67,6 +67,8 @@ class PpoOptimizer(object):
             clipfrac = tf.reduce_mean(tf.to_float(tf.abs(pg_losses2 - pg_loss_surr) > 1e-6))
 
             self.total_loss = pg_loss + ent_loss + vf_loss
+            self.discrim_loss = dynamics.discriminator_loss
+            self.generator_loss = dynamics.generator_loss
             self.to_report = {'tot': self.total_loss, 'pg': pg_loss, 'vf': vf_loss, 'ent': entropy,
                               'approxkl': approxkl, 'clipfrac': clipfrac}
 
@@ -74,12 +76,23 @@ class PpoOptimizer(object):
         self.loss_names, self._losses = zip(*list(self.to_report.items()))
 
         params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
+        discrim_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES,
+                                           'dynamics_loss/discriminator')
+        generator_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES,
+                                           'dynamics_loss/dynamics')
         if MPI.COMM_WORLD.Get_size() > 1:
             trainer = MpiAdamOptimizer(learning_rate=self.ph_lr, comm=MPI.COMM_WORLD)
         else:
             trainer = tf.train.AdamOptimizer(learning_rate=self.ph_lr)
+            discrim_trainer = tf.train.AdamOptimizer(learning_rate=self.ph_lr/10.0)
+            generator_trainer = tf.train.AdamOptimizer(learning_rate=self.ph_lr/10.0)
         gradsandvars = trainer.compute_gradients(self.total_loss, params)
+        discrim_gradsandvars = trainer.compute_gradients(self.discrim_loss, discrim_params)
+        generator_gradsandvars = trainer.compute_gradients(self.generator_loss, generator_params)
+
         self._train = trainer.apply_gradients(gradsandvars)
+        self._discrim_train = discrim_trainer.apply_gradients(discrim_gradsandvars)
+        self._generator_train = generator_trainer.apply_gradients(generator_gradsandvars)
 
         if MPI.COMM_WORLD.Get_rank() == 0:
             getsess().run(tf.variables_initializer(tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)))
@@ -151,7 +164,7 @@ class PpoOptimizer(object):
             vpredstd=self.rollout.buf_vpreds.std(),
             ev=explained_variance(self.rollout.buf_vpreds.ravel(), self.buf_rets.ravel()),
             rew_mean=np.mean(self.rollout.buf_rews),
-            recent_best_ext_ret=self.rollout.current_max
+            #spowers TODO. This is None sometimes.: recent_best_ext_ret=self.rollout.current_max
         )
         if self.rollout.best_ext_ret is not None:
             info['best_ext_ret'] = self.rollout.best_ext_ret
@@ -183,6 +196,7 @@ class PpoOptimizer(object):
             (self.dynamics.last_ob,
              self.rollout.buf_obs_last.reshape([self.nenvs * self.nsegs_per_env, 1, *self.ob_space.shape]))
         ])
+
         mblossvals = []
 
         for _ in range(self.nepochs):
@@ -192,7 +206,7 @@ class PpoOptimizer(object):
                 mbenvinds = envinds[start:end]
                 fd = {ph: buf[mbenvinds] for (ph, buf) in ph_buf}
                 fd.update({self.ph_lr: self.lr, self.ph_cliprange: self.cliprange})
-                mblossvals.append(getsess().run(self._losses + (self._train,), fd)[:-1])
+                mblossvals.append(getsess().run(self._losses + (self._train, self._discrim_train, self._generator_train), fd)[:-3])
 
         mblossvals = [mblossvals[0]]
         info.update(zip(['opt_' + ln for ln in self.loss_names], np.mean([mblossvals[0]], axis=0)))

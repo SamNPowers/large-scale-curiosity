@@ -1,0 +1,7 @@
+[
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "idf"},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "vaesph"},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "vaenonsph"},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none"},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "dynamics_loss_off": true}
+]

@@ -15,6 +15,8 @@ class CuriosityExperimentConfig(ExperimentConfigBase):
         # Params used within the large_scale_curiosity codebase
         self.use_discrim_loss_as_curiosity = False
         self.dynamics_loss_off = False
+        self.discrim_learning_rate = 1e-5
+        self.generator_learning_rate = 1e-5
 
     def _load_single_experiment(self, config_json):
         self.envs_per_process = config_json.pop('envs_per_process', self.envs_per_process)
@@ -23,6 +25,8 @@ class CuriosityExperimentConfig(ExperimentConfigBase):
 
         self.use_discrim_loss_as_curiosity = config_json.pop('use_discrim_loss_as_curiosity', self.use_discrim_loss_as_curiosity)
         self.dynamics_loss_off = config_json.pop('dynamics_loss_off', self.dynamics_loss_off)
+        self.discrim_learning_rate = config_json.pop('discrim_learning_rate', self.discrim_learning_rate)
+        self.generator_learning_rate = config_json.pop('generator_learning_rate', self.generator_learning_rate)
 
         if len(config_json) > 0:
             raise UnknownExperimentConfigEntry("JSON still had elements after parsing: {}".format(config_json.keys()))

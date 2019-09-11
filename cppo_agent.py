@@ -85,8 +85,8 @@ class PpoOptimizer(object):
             trainer = MpiAdamOptimizer(learning_rate=self.ph_lr, comm=MPI.COMM_WORLD)
         else:
             trainer = tf.train.AdamOptimizer(learning_rate=self.ph_lr)
-            discrim_trainer = tf.train.AdamOptimizer(learning_rate=self.ph_lr/10.0)
-            generator_trainer = tf.train.AdamOptimizer(learning_rate=self.ph_lr/10.0)
+            discrim_trainer = tf.train.AdamOptimizer(learning_rate=self.experiment_config.discrim_learning_rate)
+            generator_trainer = tf.train.AdamOptimizer(learning_rate=self.experiment_config.generator_learning_rate)
         gradsandvars = trainer.compute_gradients(self.total_loss, params)
         discrim_gradsandvars = trainer.compute_gradients(self.discrim_loss, discrim_params)
         generator_gradsandvars = trainer.compute_gradients(self.generator_loss, generator_params)

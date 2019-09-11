@@ -11,5 +11,11 @@
   {"use_discrim_loss_as_curiosity": false, "feat_learning": "none", "env": "SeaquestNoFrameskip-v4"},
   {"use_discrim_loss_as_curiosity": false, "feat_learning": "none", "env": "PongNoFrameskip-v4"},
   {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "env": "BeamRiderNoFrameskip-v4"},
-  {"use_discrim_loss_as_curiosity": false, "feat_learning": "none", "env": "BeamRiderNoFrameskip-v4"}
+  {"use_discrim_loss_as_curiosity": false, "feat_learning": "none", "env": "BeamRiderNoFrameskip-v4"},
+
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "dynamics_loss_off": true},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "discrim_learning_rate": 0.0},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "generator_learning_rate": 0.0},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "env": "SeaquestNoFrameskip-v4"}
+
 ]

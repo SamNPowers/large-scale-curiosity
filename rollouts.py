@@ -71,6 +71,7 @@ class Rollout(object):
         # if n_updates is a perfect cube, save a video
         root = self.num_rollouts ** (1/3)
         if math.isclose(root, round(root)):
+            print("Recording video for episode {}".format(self.num_rollouts))
             self.video_recorder.save_video(self.num_rollouts, observations=self.buf_obs, internal_rewards=int_rew)
 
     def rollout_step(self):

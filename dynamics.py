@@ -113,10 +113,15 @@ class Dynamics(object):
         # Update the dynamics both to make the features match the input ones, and to satisfy the generator.
         dynamics_loss = tf.reduce_mean((x - tf.stop_gradient(self.out_features)) ** 2, -1)
 
+        if self.experiment_config.discrim_based_on_pred:
+            discrim_input = x
+        else:
+            discrim_input = self.out_features
+
         # Now use the discriminator to evaluate the prediction that was made, and use that as the reward.
         discrim_pred_for_x = self.create_discriminator(prev_state=flatten_two_dims(self.features),
                                                        action=ac,
-                                                       state=flatten_two_dims(self.out_features))
+                                                       state=flatten_two_dims(discrim_input))
         discrim_pred_for_x = tf.sigmoid(discrim_pred_for_x)  # Since the discriminator output is logits for the loss function.
         discrim_pred_for_x = tf.reduce_mean(unflatten_first_dim(discrim_pred_for_x, sh), -1)  # Really just removing the last 1. At the moment this just reflects symmetry with above. TODO less obtuse
 
@@ -124,6 +129,10 @@ class Dynamics(object):
         # If discrim_pred is close to 1, the term in the log will be close to 0, reward will be inf, so add an eps.
         # If discrim pred is close to 0, the term in the log will be close to inf, so add an eps to the denom
         discrim_reward = -tf.log((1-discrim_pred_for_x + eps)/(discrim_pred_for_x + eps))
+
+        # Invert the reward if we're using the predicted version
+        if self.experiment_config.discrim_based_on_pred:
+            discrim_reward = -discrim_reward
 
         return dynamics_loss, generator_train_loss, discrim_train_loss, discrim_reward
 

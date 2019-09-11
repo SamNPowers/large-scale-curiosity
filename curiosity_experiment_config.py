@@ -19,6 +19,7 @@ class CuriosityExperimentConfig(ExperimentConfigBase):
         self.discrim_learning_rate = 1e-5
         self.generator_learning_rate = 1e-5
         self.discrim_based_on_pred = False
+        self.use_dynamics_in_discrim_reward = False
 
     def _load_single_experiment(self, config_json):
         self.envs_per_process = config_json.pop('envs_per_process', self.envs_per_process)
@@ -31,6 +32,7 @@ class CuriosityExperimentConfig(ExperimentConfigBase):
         self.discrim_learning_rate = config_json.pop('discrim_learning_rate', self.discrim_learning_rate)
         self.generator_learning_rate = config_json.pop('generator_learning_rate', self.generator_learning_rate)
         self.discrim_based_on_pred = config_json.pop('discrim_based_on_pred', self.discrim_based_on_pred)
+        self.use_dynamics_in_discrim_reward = config_json.pop('use_dynamics_in_discrim_reward', self.use_dynamics_in_discrim_reward)
 
         if len(config_json) > 0:
             raise UnknownExperimentConfigEntry("JSON still had elements after parsing: {}".format(config_json.keys()))

@@ -114,9 +114,9 @@ class Dynamics(object):
         dynamics_loss = tf.reduce_mean((x - tf.stop_gradient(self.out_features)) ** 2, -1)
 
         if self.experiment_config.discrim_based_on_pred:
-            discrim_input = x
+            discrim_input = tf.stop_gradient(x)
         else:
-            discrim_input = self.out_features
+            discrim_input = tf.stop_gradient(self.out_features)
 
         # Now use the discriminator to evaluate the prediction that was made, and use that as the reward.
         discrim_pred_for_x = self.create_discriminator(prev_state=flatten_two_dims(self.features),
@@ -133,6 +133,9 @@ class Dynamics(object):
         # Invert the reward if we're using the predicted version
         if self.experiment_config.discrim_based_on_pred:
             discrim_reward = -discrim_reward
+
+        if self.experiment_config.use_dynamics_in_discrim_reward:
+            discrim_reward = dynamics_loss * discrim_reward
 
         return dynamics_loss, generator_train_loss, discrim_train_loss, discrim_reward
 

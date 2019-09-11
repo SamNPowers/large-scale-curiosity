@@ -9,7 +9,7 @@ class VideoRecorder(object):
 
     def add_metric_to_frame(self, image, metric, t, position):
         rounded_metric = str(round(metric[t], 1))
-        normalized_metric = rounded_metric[t] / np.max(rounded_metric)
+        normalized_metric = metric[t] / np.max(metric)
 
         text_color = (0, 255, 255 * (1.0-normalized_metric))
         font = cv2.FONT_HERSHEY_SIMPLEX

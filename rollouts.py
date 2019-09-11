@@ -1,14 +1,16 @@
 from collections import deque, defaultdict
 
+import math
 import numpy as np
 from mpi4py import MPI
 
 from recorder import Recorder
+from video_recorder import VideoRecorder
 
 
 class Rollout(object):
     def __init__(self, ob_space, ac_space, nenvs, nsteps_per_seg, nsegs_per_env, nlumps, envs, policy,
-                 int_rew_coeff, ext_rew_coeff, record_rollouts, dynamics):
+                 int_rew_coeff, ext_rew_coeff, record_rollouts, dynamics, experiment_config):
         self.nenvs = nenvs
         self.nsteps_per_seg = nsteps_per_seg
         self.nsegs_per_env = nsegs_per_env
@@ -20,6 +22,7 @@ class Rollout(object):
         self.envs = envs
         self.policy = policy
         self.dynamics = dynamics
+        self.experiment_config = experiment_config
 
         self.reward_fun = lambda ext_rew, int_rew: ext_rew_coeff * np.clip(ext_rew, -1., 1.) + int_rew_coeff * int_rew
 
@@ -41,6 +44,7 @@ class Rollout(object):
         self.int_rew = np.zeros((nenvs,), np.float32)
 
         self.recorder = Recorder(nenvs=self.nenvs, nlumps=self.nlumps) if record_rollouts else None
+        self.video_recorder = VideoRecorder(log_dir=self.experiment_config.experiment_output_dir)
         self.statlists = defaultdict(lambda: deque([], maxlen=100))
         self.stats = defaultdict(float)
         self.best_ext_ret = None
@@ -48,6 +52,7 @@ class Rollout(object):
         self.all_scores = []
 
         self.step_count = 0
+        self.num_rollouts = 0
 
     def collect_rollout(self):
         self.ep_infos_new = []
@@ -55,12 +60,18 @@ class Rollout(object):
             self.rollout_step()
         self.calculate_reward()
         self.update_info()
+        self.num_rollouts += 1
 
     def calculate_reward(self):
         int_rew = self.dynamics.calculate_loss(ob=self.buf_obs,
                                                last_ob=self.buf_obs_last,
                                                acs=self.buf_acs)
         self.buf_rews[:] = self.reward_fun(int_rew=int_rew, ext_rew=self.buf_ext_rews)
+
+        # if n_updates is a perfect cube, save a video
+        root = self.num_rollouts ** (1/3)
+        if math.isclose(root, round(root)):
+            self.video_recorder.save_video(self.num_rollouts, observations=self.buf_obs, internal_rewards=int_rew)
 
     def rollout_step(self):
         t = self.step_count % self.nsteps

@@ -91,7 +91,8 @@ class Trainer(object):
             normadv=hps['norm_adv'],
             ext_coeff=hps['ext_coeff'],
             int_coeff=hps['int_coeff'],
-            dynamics=self.dynamics
+            dynamics=self.dynamics,
+            experiment_config=experiment_config
         )
 
         self.agent.to_report['aux'] = tf.reduce_mean(self.feature_extractor.loss)
@@ -164,7 +165,7 @@ def get_experiment_environment(**args):
 
     dir = args["output_dir"]
     logger_context = logger.scoped_configure(dir=dir,
-                                             format_strs=['tensorboard', 'stdout', 'log']) # if MPI.COMM_WORLD.Get_rank() == 0 else ['log'])
+                                             format_strs=['tensorboard', 'stdout', 'log']) # spowers: if MPI.COMM_WORLD.Get_rank() == 0 else ['log'])
     tf_context = setup_tensorflow_session()
     return logger_context, tf_context
 

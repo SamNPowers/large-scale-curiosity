@@ -1,3 +1,4 @@
 [
-  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "envs_per_process": 8, "nsteps_per_seg": 16}
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "envs_per_process": 8, "nsteps_per_seg": 16},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "envs_per_process": 8, "nsteps_per_seg": 16, "env": "SeaquestNoFrameskip-v4"}
 ]

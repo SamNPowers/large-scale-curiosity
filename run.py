@@ -97,13 +97,16 @@ class Trainer(object):
 
         self.agent.to_report['aux'] = tf.reduce_mean(self.feature_extractor.loss)
         self.agent.total_loss += self.agent.to_report['aux']
-        self.agent.to_report['dyn_loss'] = tf.reduce_mean(self.dynamics.loss)
 
+        self.agent.to_report['dyn_loss'] = tf.reduce_mean(self.dynamics.loss)
         if not experiment_config.dynamics_loss_off:
             self.agent.total_loss += self.agent.to_report['dyn_loss']
 
         self.agent.to_report['discrim_loss'] = tf.reduce_mean(self.dynamics.discriminator_loss)
+
         self.agent.to_report['generator_loss'] = tf.reduce_mean(self.dynamics.generator_loss)
+        self.agent.total_loss += experiment_config.generator_scale * self.agent.to_report['generator_loss']
+
         self.agent.to_report['discrim_reward'] = tf.reduce_mean(self.dynamics.discriminator_reward)
         self.agent.to_report['feat_var'] = tf.reduce_mean(tf.nn.moments(self.feature_extractor.features, [0, 1])[1])
 

@@ -41,15 +41,16 @@ class Dynamics(object):
             x = unflatten_first_dim(x, sh)
         return x
 
-    def train_discriminator(self, prev_state, action, true_state, pred_state):
+    def train_discriminator(self, prev_state, action, true_state, pred_state, true_frac=0.5):
         """
         Takes in a set of previous states, actions, and both the true result and the predicted result.
         Creates a set of targets from these (basically randomly picking from both), then creating the discriminator from that.
+        True_frac is the fraction of the combined list that is composed of true states.
         """
         batch_size = tf.shape(prev_state[:, 0])
 
         # Create a list of flags where 1 means use the true state.
-        true_state_flags = tf.random_uniform(batch_size, minval=0, maxval=1) > .5
+        true_state_flags = tf.random_uniform(batch_size, minval=0, maxval=1) < true_frac
         combined_states = tf.where(true_state_flags, x=true_state, y=pred_state)
         targets = tf.where(true_state_flags, x=tf.ones(batch_size), y=tf.zeros(batch_size))  # Prefer to explicitly define rather than relying on bool conversion
         targets = tf.expand_dims(targets, axis=-1)
@@ -105,10 +106,17 @@ class Dynamics(object):
         # Eventually this will be replaced with a loss for the dynamics model that attempts to exclude entropy
         discrim_predictions, discrim_loss = self.train_discriminator(prev_state=flatten_two_dims(self.features),
                                                                      action=ac,
-                                                                     true_state=flatten_two_dims(self.out_features),
-                                                                     pred_state=flatten_two_dims(x))  # TODO: conceptually should stop the gradient, but the discrim doesn't have access to the generator params anyway, and this way is convenient for creating the generator loss
+                                                                     true_state=flatten_two_dims(tf.stop_gradient(self.out_features)),
+                                                                     pred_state=flatten_two_dims(tf.stop_gradient(x)))  # TODO: conceptually should stop the gradient, but the discrim doesn't have access to the generator params anyway, and this way is convenient for creating the generator loss
         discrim_train_loss = tf.reduce_mean(unflatten_first_dim(discrim_loss, sh), -1)  # Really just removing the last 1. At the moment this just reflects symmetry with below.
-        generator_train_loss = -discrim_train_loss  # Should just effectively ignore the ones to the "real", because there are no gradients to update
+
+        # Should just effectively ignore the ones to the "pred", because there are no gradients to update
+        _, generator_loss = self.train_discriminator(prev_state=flatten_two_dims(self.features),
+                                                     action=ac,
+                                                     true_state=flatten_two_dims(x),
+                                                     pred_state=flatten_two_dims(tf.stop_gradient(self.out_features)),  # Since true_frac is 1, none of these get used. The out_features are a fancy placeholder
+                                                     true_frac=1.0)
+        generator_train_loss = tf.reduce_mean(unflatten_first_dim(generator_loss, sh), -1)  # Really just removing the last 1. At the moment this just reflects symmetry with below.
 
         # Update the dynamics both to make the features match the input ones, and to satisfy the generator.
         dynamics_loss = tf.reduce_mean((x - tf.stop_gradient(self.out_features)) ** 2, -1)

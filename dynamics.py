@@ -107,7 +107,7 @@ class Dynamics(object):
         discrim_predictions, discrim_loss = self.train_discriminator(prev_state=flatten_two_dims(self.features),
                                                                      action=ac,
                                                                      true_state=flatten_two_dims(tf.stop_gradient(self.out_features)),
-                                                                     pred_state=flatten_two_dims(tf.stop_gradient(x)))  # TODO: conceptually should stop the gradient, but the discrim doesn't have access to the generator params anyway, and this way is convenient for creating the generator loss
+                                                                     pred_state=flatten_two_dims(tf.stop_gradient(x)))
         discrim_train_loss = tf.reduce_mean(unflatten_first_dim(discrim_loss, sh), -1)  # Really just removing the last 1. At the moment this just reflects symmetry with below.
 
         # Should just effectively ignore the ones to the "pred", because there are no gradients to update

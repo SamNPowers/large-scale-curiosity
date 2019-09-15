@@ -22,5 +22,6 @@
   {"use_discrim_loss_as_curiosity": true, "feat_learning": "none"},
   {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "generator_loss_from_discrim_loss": true},
   {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "discrim_learning_rate": 0.0, "discrim_based_on_pred": true},
-  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "generator_scale": 0.0, "discrim_based_on_pred": true}
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "generator_scale": 0.0, "discrim_based_on_pred": true},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "generator_scale": 0.0, "discrim_based_on_pred": true, "use_dynamics_in_discrim_reward": true}
 ]

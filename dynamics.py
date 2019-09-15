@@ -107,16 +107,20 @@ class Dynamics(object):
         discrim_predictions, discrim_loss = self.train_discriminator(prev_state=flatten_two_dims(self.features),
                                                                      action=ac,
                                                                      true_state=flatten_two_dims(tf.stop_gradient(self.out_features)),
-                                                                     pred_state=flatten_two_dims(tf.stop_gradient(x)))
+                                                                     pred_state=flatten_two_dims(x))
         discrim_train_loss = tf.reduce_mean(unflatten_first_dim(discrim_loss, sh), -1)  # Really just removing the last 1. At the moment this just reflects symmetry with below.
 
-        # Should just effectively ignore the ones to the "pred", because there are no gradients to update
-        _, generator_loss = self.train_discriminator(prev_state=flatten_two_dims(self.features),
-                                                     action=ac,
-                                                     true_state=flatten_two_dims(x),
-                                                     pred_state=flatten_two_dims(tf.stop_gradient(self.out_features)),  # Since true_frac is 1, none of these get used. The out_features are a fancy placeholder
-                                                     true_frac=1.0)
-        generator_train_loss = tf.reduce_mean(unflatten_first_dim(generator_loss, sh), -1)  # Really just removing the last 1. At the moment this just reflects symmetry with below.
+        # There are two methods for getting the generator loss: one is to negate the discriminator (drive x features away from 0), and the other is to drive the x features to 1.
+        if self.experiment_config.generator_loss_from_discrim_loss:
+            generator_train_loss = -discrim_train_loss
+        else:
+            # Should just effectively ignore the ones to the "pred", because there are no gradients to update
+            _, generator_loss = self.train_discriminator(prev_state=flatten_two_dims(self.features),
+                                                         action=ac,
+                                                         true_state=flatten_two_dims(x),
+                                                         pred_state=flatten_two_dims(tf.stop_gradient(self.out_features)),  # Since true_frac is 1, none of these get used. The out_features are a fancy placeholder
+                                                         true_frac=1.0)
+            generator_train_loss = tf.reduce_mean(unflatten_first_dim(generator_loss, sh), -1)  # Really just removing the last 1. At the moment this just reflects symmetry with below.
 
         # Update the dynamics both to make the features match the input ones, and to satisfy the generator.
         dynamics_loss = tf.reduce_mean((x - tf.stop_gradient(self.out_features)) ** 2, -1)

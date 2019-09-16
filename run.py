@@ -3,6 +3,7 @@ try:
     from OpenGL import GLU
 except:
     print("no OpenGL.GLU")
+import torch  # TODO snpowers, a hack to bring in the right libraries on yoda.
 import functools
 import os.path as osp
 from functools import partial

@@ -204,7 +204,7 @@ class PpoOptimizer(object):
                 mbenvinds = envinds[start:end]
                 fd = {ph: buf[mbenvinds] for (ph, buf) in ph_buf}
                 fd.update({self.ph_lr: self.lr, self.ph_cliprange: self.cliprange})
-                mblossvals.append(getsess().run(self._losses + (self._train, self._discrim_train), fd)[:-2])
+                mblossvals.append(getsess().run(self._losses + (self._train), fd)[:-1])
 
         mblossvals = [mblossvals[0]]
         info.update(zip(['opt_' + ln for ln in self.loss_names], np.mean([mblossvals[0]], axis=0)))

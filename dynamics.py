@@ -144,7 +144,7 @@ class Dynamics(object):
         if self.experiment_config.use_dynamics_in_discrim_reward:
             discrim_reward = dynamics_loss * discrim_reward
 
-        return dynamics_loss, generator_train_loss, discrim_train_loss, discrim_reward
+        return tf.stop_gradient(dynamics_loss), tf.stop_gradient(generator_train_loss), tf.stop_gradient(discrim_train_loss), tf.stop_gradient(discrim_reward)
 
     def calculate_loss(self, ob, last_ob, acs):
         n_chunks = 8

@@ -108,7 +108,7 @@ class Trainer(object):
         self.agent.total_loss += experiment_config.generator_scale * self.agent.to_report['generator_loss']
 
         self.agent.to_report['discrim_reward'] = tf.reduce_mean(self.dynamics.discriminator_reward)
-        #self.agent.to_report['discrim_pred'] = tf.reduce_mean(self.dynamics.discriminator_prediction)
+        self.agent.to_report['discrim_pred'] = tf.reduce_mean(self.dynamics.discriminator_prediction)
         self.agent.to_report['feat_var'] = tf.reduce_mean(tf.nn.moments(self.feature_extractor.features, [0, 1])[1])
 
     def _set_env_vars(self):

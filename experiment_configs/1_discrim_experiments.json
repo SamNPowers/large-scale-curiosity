@@ -34,5 +34,7 @@
   {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "discrim_learning_rate": 0.0},
   {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "discrim_learning_rate": 0.0, "discrim_based_on_pred": true},
   {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "discrim_learning_rate": 0.0},
-  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "discrim_learning_rate": 0.0, "discrim_based_on_pred": true}
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "discrim_learning_rate": 0.0, "discrim_based_on_pred": true},
+  {"use_discrim_loss_as_curiosity": false, "feat_learning": "none", "discrim_learning_rate": 0.0},
+  {"use_discrim_loss_as_curiosity": false, "feat_learning": "none", "discrim_learning_rate": 0.0, "discrim_based_on_pred": true}
 ]

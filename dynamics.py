@@ -100,7 +100,7 @@ class Dynamics(object):
                 x = residual(x)
             n_out_features = self.out_features.get_shape()[-1].value
             x = tf.layers.dense(add_ac(x), n_out_features, activation=None)
-            x = unflatten_first_dim(x, sh)
+            x = tf.stop_gradient(unflatten_first_dim(x, sh))  # TODO temp for debug
 
         # Compute the loss that allows us to update the discriminator
         # Eventually this will be replaced with a loss for the dynamics model that attempts to exclude entropy

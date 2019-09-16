@@ -26,7 +26,7 @@ class Dynamics(object):
         self.out_features = self.auxiliary_task.next_features
 
         with tf.variable_scope(self.scope + "_loss"):
-            self.loss, self.generator_loss, self.discriminator_loss, self.discriminator_reward = self.get_loss()
+            self.loss, self.generator_loss, self.discriminator_loss, self.discriminator_reward, self.discriminator_prediction = self.get_loss()
 
     def get_features(self, x, reuse):
         nl = tf.nn.leaky_relu
@@ -144,7 +144,7 @@ class Dynamics(object):
         if self.experiment_config.use_dynamics_in_discrim_reward:
             discrim_reward = dynamics_loss * discrim_reward
 
-        return dynamics_loss, generator_train_loss, discrim_train_loss, 0*discrim_reward
+        return dynamics_loss, generator_train_loss, discrim_train_loss, 0*discrim_reward, discrim_pred_for_x
 
     def calculate_loss(self, ob, last_ob, acs):
         n_chunks = 8

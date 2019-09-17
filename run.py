@@ -155,9 +155,9 @@ def get_experiment_environment(**args):
     set_global_seeds(process_seed)
     setup_mpi_gpus()
 
-    logger_context = logger.scoped_configure(dir=None,
-                                             format_strs=['stdout', 'log',
-                                                          'csv'] if MPI.COMM_WORLD.Get_rank() == 0 else ['log'])
+    dir = args["output_dir"]
+    logger_context = logger.scoped_configure(dir=dir,
+                                             format_strs=['tensorboard', 'stdout', 'log'] if MPI.COMM_WORLD.Get_rank() == 0 else ['log'])
     tf_context = setup_tensorflow_session()
     return logger_context, tf_context
 
@@ -206,6 +206,7 @@ if __name__ == '__main__':
     parser.add_argument('--layernorm', type=int, default=0)
     parser.add_argument('--feat_learning', type=str, default="none",
                         choices=["none", "idf", "vaesph", "vaenonsph", "pix2pix"])
+    parser.add_argument('--output_dir', type=str, default="tmp")
 
     args = parser.parse_args()
 

@@ -73,7 +73,7 @@ class PpoOptimizer(object):
     def start_interaction(self, env_fns, dynamics, nlump=2):
         self.loss_names, self._losses = zip(*list(self.to_report.items()))
 
-        params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
+        params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, 'pol')
         if MPI.COMM_WORLD.Get_size() > 1:
             trainer = MpiAdamOptimizer(learning_rate=self.ph_lr, comm=MPI.COMM_WORLD)
         else:

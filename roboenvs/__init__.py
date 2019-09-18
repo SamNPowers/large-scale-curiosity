@@ -17,6 +17,12 @@ register(
     tags={"pg_complexity": 20 * 1000000},
 )
 
+register(
+    id='StateIndependentMachineNoFrameskip-v1',
+    entry_point='roboenvs.state_independent_machine:StateIndependentMachine',
+    max_episode_steps=10000
+)
+
 
 def make_robopong():
     return gym.make("RoboschoolPong-v2")

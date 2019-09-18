@@ -100,14 +100,15 @@ class Dynamics(object):
                 x = residual(x)
             n_out_features = self.out_features.get_shape()[-1].value
             x = tf.layers.dense(add_ac(x), n_out_features, activation=None)
-            x = tf.stop_gradient(unflatten_first_dim(x, sh))  # TODO temp for debug
+            x = unflatten_first_dim(x, sh)
 
         # Compute the loss that allows us to update the discriminator
         # Eventually this will be replaced with a loss for the dynamics model that attempts to exclude entropy
         discrim_predictions, discrim_loss = self.train_discriminator(prev_state=flatten_two_dims(self.features),
                                                                      action=ac,
                                                                      true_state=flatten_two_dims(tf.stop_gradient(self.out_features)),
-                                                                     pred_state=flatten_two_dims(x))
+                                                                     pred_state=flatten_two_dims(tf.stop_gradient(x)),
+                                                                     true_frac=self.experiment_config.discrim_true_frac)
         discrim_train_loss = tf.reduce_mean(unflatten_first_dim(discrim_loss, sh), -1)  # Really just removing the last 1. At the moment this just reflects symmetry with below.
 
         _, generator_loss = self.train_discriminator(prev_state=flatten_two_dims(self.features),

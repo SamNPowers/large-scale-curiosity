@@ -4,5 +4,13 @@
   {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "discrim_learning_rate": 0.0},
   {"use_discrim_loss_as_curiosity": false, "feat_learning": "none", "discrim_true_frac": 0.95},
   {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "env": "StateIndependentMachineNoFrameskip-v1", "envs_per_process": 8, "nsteps_per_seg": 16},
-  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "env": "StateIndependentMachineNoFrameskip-v1", "envs_per_process": 8, "nsteps_per_seg": 16}
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "env": "StateIndependentMachineNoFrameskip-v1", "envs_per_process": 8, "nsteps_per_seg": 16},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "env": "StateIndependentMachineNoFrameskip-v1", "envs_per_process": 8, "nsteps_per_seg": 16, "invert_reward": true},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "env": "StateIndependentMachineNoFrameskip-v1", "envs_per_process": 8, "nsteps_per_seg": 16, "invert_reward": true, "discrim_learning_rate": 0.01},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "env": "StateIndependentMachineNoFrameskip-v1", "envs_per_process": 8, "nsteps_per_seg": 16, "invert_reward": true, "discrim_learning_rate": 1e-6},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "env": "StateIndependentMachineNoFrameskip-v1", "envs_per_process": 8, "nsteps_per_seg": 16, "invert_reward": true, "discrim_learning_rate": 1e-6},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "env": "StateIndependentMachineNoFrameskip-v1", "envs_per_process": 8, "nsteps_per_seg": 16, "invert_reward": true, "discrim_learning_rate": 1e-5,
+    "generator_scale": 0.01},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "env": "StateIndependentMachineNoFrameskip-v1", "envs_per_process": 8, "nsteps_per_seg": 16, "invert_reward": true, "discrim_learning_rate": 1e-5,
+    "generator_scale": 0.5}
 ]

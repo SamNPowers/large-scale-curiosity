@@ -20,7 +20,7 @@ register(
 register(
     id='StateIndependentMachineNoFrameskip-v1',
     entry_point='roboenvs.state_independent_machine:StateIndependentMachine',
-    max_episode_steps=10000
+    max_episode_steps=4800
 )
 
 

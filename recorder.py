@@ -54,7 +54,7 @@ class Recorder(object):
         self.ep_infos[i].clear()
 
     def episode_worth_saving(self, i):
-        return (i == 0 and MPI.COMM_WORLD.Get_rank() == 0)
+        return (MPI.COMM_WORLD.Get_rank() == 0)
 
     def is_first_episode_step(self, i):
         return len(self.int_rews[i]) == 0

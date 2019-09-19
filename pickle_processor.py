@@ -6,7 +6,7 @@ from collections import defaultdict
 
 env_data = defaultdict(list)
 
-with open( "/Users/powerss/Git/large-scale-curiosity-github/experiment_configs/tmp/-1_debug/11/env0_0.pk", "rb" ) as pickled_file:
+with open( "/Users/powerss/Git/large-scale-curiosity-github/experiment_configs/tmp/-1_debug/12/env0_0.pk", "rb" ) as pickled_file:
     # We may have appended multiple objects to the same file (one per episode); load them all.
     while True:
         try:

@@ -4,5 +4,6 @@
   {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "generator_scale": 0.5},
   {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "invert_reward": true},
   {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "invert_reward": true, "generator_scale": 0.5},
-  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "discrim_true_frac": 0.95}
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "discrim_true_frac": 0.95},
+  {"use_discrim_loss_as_curiosity": true, "feat_learning": "none", "invert_reward": true, "generator_scale": 0.5, "discrim_true_frac": 0.95}
 ]

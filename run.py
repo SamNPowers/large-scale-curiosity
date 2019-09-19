@@ -8,7 +8,7 @@ import os.path as osp
 from functools import partial
 
 import gym
-import roboenvs  # To call the environment registration of the custom envs
+#import roboenvs  # To call the environment registration of the custom envs
 import tensorflow as tf
 from baselines import logger
 from baselines.bench import Monitor

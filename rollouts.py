@@ -115,8 +115,16 @@ class Rollout(object):
             #
             #     self.int_rew[sli] = int_rew
             #     self.buf_rews[sli, t - 1] = self.reward_fun(ext_rew=prevrews, int_rew=int_rew)
+
+            # Computing here just to record it. TODO
+            last_obs_t = t // self.nsteps_per_seg
+            int_rew = self.dynamics.calculate_loss(ob=self.buf_obs[sli, t:t+1],
+                                                   last_ob=self.buf_obs_last[sli, last_obs_t:last_obs_t+1],  # TODO: I'm not 100% on this. Check it.
+                                                   acs=self.buf_acs[sli, t:t+1])
+
+            # No longer doing this here because int_rew is always 0, since it gets computed after the rollout occurs
             if self.recorder is not None:
-                self.recorder.record(timestep=self.step_count, lump=l, acs=acs, infos=infos, int_rew=self.int_rew[sli],
+                self.recorder.record(timestep=self.step_count, lump=l, acs=acs, infos=infos, int_rew=int_rew,
                                      ext_rew=prevrews, news=news)
         self.step_count += 1
         if s == self.nsteps_per_seg - 1:
